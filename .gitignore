@@ -1,0 +1,40 @@
+# --- Secrets / env (NEVER commit) ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# --- Data / runtime (project-specific; adjust {{DATA_DIR}}) ---
+{{DATA_DIR}}/
+workspace/
+*.db
+*.sqlite
+*.sqlite3
+*-wal
+*-shm
+*-journal
+
+# --- Python ---
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+dist/
+build/
+*.egg-info/
+
+# --- Agent-local (machine-specific, never shared) ---
+.claude/settings.local.json
+CLAUDE.local.md
+MEMORY.md
+
+# --- graphify ---
+# Decision: COMMIT graphify-out/ (it auto-rebuilds on commit and is the shared
+# context source-of-truth). Do NOT ignore it. If you prefer to keep it local,
+# uncomment the next line.
+# graphify-out/

@@ -1,0 +1,55 @@
+# Configuration for scripts/verify-clean-tree.py — the secrets/PII pre-commit gate.
+# All project specifics live here so the scanner stays generic. Edit freely.
+
+# Staged paths matching these glob patterns are forbidden outright (a violation).
+forbidden_paths = [
+    ".env",
+    "*.pem",
+    "*.key",
+    "*.p12",
+    "*.pfx",
+    "*.db",
+    "*.sqlite",
+    "*.sqlite3",
+    # {{ADD PROJECT-SPECIFIC FORBIDDEN PATHS HERE, e.g. "case/**", "secrets/**" }}
+]
+
+# Paths exempt from forbidden_paths (allowlist; checked first).
+allowed_paths = [
+    ".env.example",
+]
+
+# Paths whose staged CONTENT is not scanned for the patterns below
+# (the gate's own files, tests, archived plans).
+content_check_allow_paths = [
+    "scripts/verify-clean-tree.py",
+    "scripts/scan-rules.toml",
+    "tests/unit/test-verify-clean-tree.py",
+    "plans/archive/**",
+]
+
+# Binary extensions skipped for content scanning.
+skip_content_extensions = [".png", ".jpg", ".jpeg", ".gif", ".pdf", ".docx", ".xlsx", ".zip"]
+
+# Optional: a directory whose files must carry a safe marker (e.g. test fixtures
+# proving they contain no real data). Leave fixture_dir = "" to disable.
+fixture_dir = ""
+fixture_safe_marker = ""
+
+# Content patterns scanned against staged blobs. Each: name, regex, message.
+[[content_patterns]]
+name = "aws_access_key_id"
+regex = "AKIA[0-9A-Z]{16}"
+message = "Looks like an AWS access key ID."
+
+[[content_patterns]]
+name = "private_key_block"
+regex = "-----BEGIN (RSA |EC |OPENSSH |DSA |PGP )?PRIVATE KEY-----"
+message = "Private key material must never be committed."
+
+[[content_patterns]]
+name = "generic_api_secret_assignment"
+regex = "(?i)(api[_-]?key|secret|token|password|passwd)\\s*[:=]\\s*[\"'][A-Za-z0-9_\\-]{16,}[\"']"
+message = "Looks like a hardcoded secret/credential assignment."
+
+# {{ADD PROJECT-SPECIFIC CONTENT PATTERNS HERE — e.g. real-name/PII regexes}}
